@@ -1,0 +1,19 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Session {
+  id          String   @id @default(cuid())
+  email       String
+  basePrompt  String
+  chosenPost  String
+  photoData   String?   // Data URL (base64) lub URL do pliku
+  createdAt   DateTime  @default(now())
+
+  @@index([createdAt])
+}
