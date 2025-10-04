@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useState } from "react";
+import QRCode from "qrcode"; // <— nowy import
 import { BASE_PROMPT_DE, OPTION_TAGS } from "@/lib/constants";
+import CopyButton from "./components/CopyButton";
 
 export default function Home() {
   const [photoDataUrl, setPhotoDataUrl] = useState<string>();
@@ -10,6 +12,11 @@ export default function Home() {
   const [picked, setPicked] = useState<number | null>(null);
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // nowy stan dla QR
+  const [qrLink, setQrLink] = useState<string | null>(null);
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
+  const [qrLoading, setQrLoading] = useState(false);
 
   const onPickFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
@@ -40,6 +47,9 @@ export default function Home() {
       const json = await res.json();
       if (!json.ok) throw new Error(json.error || "Fehler");
       setVariants(json.variants);
+      // wyczyszczamy poprzedni QR (jeśli był)
+      setQrLink(null);
+      setQrDataUrl(null);
     } catch (e: any) {
       alert(e.message ?? "Fehler bei der Generierung");
     } finally {
@@ -50,6 +60,11 @@ export default function Home() {
   const ready = async () => {
     if (picked === null) return alert("Bitte eine Variante auswählen.");
     if (!email) return alert("Bitte E-Mail eingeben.");
+
+    setQrLoading(true);
+    setQrLink(null);
+    setQrDataUrl(null);
+
     try {
       const res = await fetch("/api/session", {
         method: "POST",
@@ -63,16 +78,27 @@ export default function Home() {
       });
       const json = await res.json();
       if (!json.ok) throw new Error(json.error || "Fehler");
-      window.location.href = json.link;
+
+      // mamy link do strony wynikowej — generujemy QR
+      setQrLink(json.link);
+      const dataUrl = await QRCode.toDataURL(json.link, {
+        width: 320,
+        margin: 1,
+        color: { dark: "#000000", light: "#FFFFFFFF" },
+      });
+      setQrDataUrl(dataUrl);
     } catch (e: any) {
-      alert(e.message ?? "Konnte Seite nicht erstellen");
+      alert(e.message ?? "Konnte Link nicht erzeugen");
+    } finally {
+      setQrLoading(false);
     }
   };
 
   return (
     <main className="lj-container">
       <h1 className="lj-h1">
-        WIR VERSTEHEN B2B<span className="lj-slash">/</span>
+        JOIN THE TEAM <span className="lj-slash">/</span>
+        <br /> AND BECOME A JOE
       </h1>
 
       {/* 1) Foto */}
@@ -136,18 +162,14 @@ export default function Home() {
 
       {/* 4) Generieren */}
       <div className="lj-section">
-        <button
-          className="lj-btn lj-btn-generate"
-          onClick={generate}
-          disabled={loading}
-        >
+        <button className="lj-btn" onClick={generate} disabled={loading}>
           {variants.length
             ? loading
-              ? "GENERIERE..."
-              : "ERNEUT GENERIEREN"
+              ? "Generiere…"
+              : "Erneut generieren"
             : loading
-            ? "GENERIERE..."
-            : "GENERIEREN"}
+            ? "Generiere…"
+            : "Generieren"}
         </button>
       </div>
 
@@ -180,7 +202,7 @@ export default function Home() {
         </section>
       )}
 
-      {/* 6) E-mail + Ready */}
+      {/* 6) E-mail + Fertig */}
       {variants.length > 0 && (
         <section className="lj-row lj-section" style={{ marginTop: 8 }}>
           <div style={{ flex: 1 }}>
@@ -193,9 +215,71 @@ export default function Home() {
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
-          <button className="lj-btn lj-btn-yellow" onClick={ready}>
-            FERTIG
+          <button
+            className="lj-btn lj-btn-yellow"
+            onClick={ready}
+            disabled={qrLoading}
+          >
+            {qrLoading ? "Erstelle Link…" : "Fertig"}
           </button>
+        </section>
+      )}
+
+      {/* 7) Sekcja QR na dole */}
+      {(qrLoading || qrDataUrl) && (
+        <section className="lj-section" style={{ marginTop: 24 }}>
+          <div className="lj-label">Dein persönlicher Link</div>
+
+          {qrLoading && (
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <span className="lj-spinner" aria-hidden="true"></span>
+              <span>Bitte warten…</span>
+            </div>
+          )}
+
+          {!qrLoading && qrDataUrl && qrLink && (
+            <div
+              style={{
+                display: "flex",
+                gap: 16,
+                alignItems: "center",
+                flexWrap: "wrap",
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={qrDataUrl}
+                alt="QR-Code"
+                style={{
+                  border: "6px solid #000",
+                  padding: 6,
+                  background: "#fff",
+                }}
+              />
+              <div>
+                <div
+                  style={{
+                    fontWeight: 700,
+                    marginBottom: 6,
+                    wordBreak: "break-all",
+                  }}
+                >
+                  {qrLink}
+                </div>
+                <div className="lj-row">
+                  <a
+                    className="lj-btn lj-btn-outline"
+                    href={qrLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Seite öffnen
+                  </a>
+                  <CopyButton text={qrLink} />
+                </div>
+              </div>
+            </div>
+          )}
         </section>
       )}
     </main>

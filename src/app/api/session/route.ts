@@ -19,15 +19,10 @@ export async function POST(req: Request) {
     data: { email, chosenPost, basePrompt, photoData: photoDataUrl },
   });
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-  const link = `${baseUrl}/s/${rec.id}`;
-
-  // HubSpot: zapisz kontakt + notatkę z linkiem
-  try {
-    await addNoteToContact(email, "LinkedIn-Post erstellt", `Link: ${link}`);
-  } catch (e) {
-    console.warn("HubSpot błąd:", e);
-  }
+  // Użyj hosta z żądania (działa z <IP>:3000 i na prod)
+  const url = new URL(req.url);
+  const origin = `${url.protocol}//${url.host}`;
+  const link = `${origin}/s/${rec.id}`;
 
   return NextResponse.json({ ok: true, id: rec.id, link });
 }
