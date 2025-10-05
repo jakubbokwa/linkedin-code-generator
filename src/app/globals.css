@@ -59,11 +59,13 @@ body {
 /* Podpisy/etykiety */
 .lj-label {
   display: block;
-  font-size: 12px;
+  font-size: 24px;
   letter-spacing: 0.02em;
-  color: #555;
-  margin: 0 0 8px;
-  text-transform: none;
+  color: var(--lj-black);
+  margin-top: 60px;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  font-weight: 900;
 }
 
 /* Karty/sekcje */
@@ -71,8 +73,6 @@ body {
   margin-bottom: 28px;
 }
 .lj-card {
-  border: 1px solid #e6e6e6;
-  border-radius: var(--lj-radius);
   padding: 12px;
   background: #fff;
 }
@@ -96,6 +96,20 @@ body {
 .lj-readonly {
   background: #f7f7f7;
   border-color: #000;
+}
+
+/* ✅ Tekst „jak akapit” – do Basis-Prompt */
+.lj-plainpara {
+  border: 0; /* brak ramki */
+  font-size: 20px; /* jak na stronie Logic Joe */
+  line-height: 1.6;
+  font-weight: 400;
+  color: #000;
+  resize: none; /* bez uchwytu zmiany rozmiaru */
+  box-shadow: none;
+  outline: none;
+  background: #f8f8f8;
+  padding: 10px;
 }
 
 /* Checkboxy – prosty kwadrat z grubą ramką */
@@ -125,21 +139,34 @@ body {
 
 /* Przyciski – „blokowe”, czarne na żółtym accencie */
 .lj-btn {
-  border: var(--lj-border) solid var(--lj-black);
-  background: var(--lj-black);
-  color: var(--lj-white);
-  padding: 12px 22px;
-  font-weight: 700;
-  text-transform: none;
+  border: var(--lj-border) solid var(--lj-yellow);
+  background: var(--lj-yellow);
+  color: var(--lj-black);
+  padding: 6px 12px;
+  text-transform: uppercase;
+  font-weight: 900;
   cursor: pointer;
+  font-size: 16px;
+  transition: color 250ms, border-color 250ms, background-color 250ms;
 }
+
+.lj-btn:hover {
+  background-color: var(--lj-black);
+  border-color: var(--lj-black);
+  color: var(--lj-white);
+  transition: color 250ms, border-color 250ms, background-color 250ms;
+}
+
 .lj-btn:disabled {
   opacity: 0.6;
   cursor: default;
 }
 .lj-btn-outline {
-  background: var(--lj-white);
+  background: var(--lj-yellow);
   color: var(--lj-black);
+  display: flex;
+  justify-content: center;
+  text-decoration: none;
 }
 .lj-btn-yellow {
   background: var(--lj-yellow);
@@ -178,23 +205,23 @@ body {
   max-height: 360px;
   width: auto;
   border: 1px solid #e6e6e6;
+  max-width: 100%;
 }
 
 /* Bloki wariantów */
 .lj-variant {
-  border: 1px solid #e6e6e6;
   border-radius: var(--lj-radius);
   padding: 12px;
+  padding-left: 0;
 }
 .lj-variant + .lj-variant {
   margin-top: 10px;
 }
 .lj-variant-title {
-  font-size: 12px;
-  font-weight: 800;
-  margin-bottom: 6px;
+  font-size: 16px;
+  font-weight: 900;
+  margin-bottom: 10px;
   text-transform: uppercase;
-  letter-spacing: 0.02em;
 }
 
 /* Przyciski w wierszu */
@@ -202,6 +229,11 @@ body {
   display: flex;
   gap: 12px;
   align-items: stretch;
+
+  @media (max-width: 1024px) {
+    flex-direction: column;
+    gap: 24px;
+  }
 }
 
 /* Spinner zgodny ze stylem (czarny, grube obrysy) */
@@ -221,12 +253,51 @@ body {
 }
 
 .lj-copied {
+  border-color: var(--lj-yellow) !important;
   background: var(--lj-yellow) !important;
   color: var(--lj-black) !important;
-  transition: background 0.3s ease, color 0.3s ease;
+  transition: color 250ms, border-color 250ms, background-color 250ms;
 }
 
 .lj-btn-fixed {
   min-width: 145px; /* dostosuj do długości najdłuższego napisu */
   text-align: center;
+}
+
+/* === styl przycisku wewnątrz file inputa === */
+.lj-input.lj-file::-webkit-file-upload-button {
+  border-radius: 0;
+  background: var(--lj-white);
+  color: var(--lj-black);
+  font-weight: 700;
+  padding: 6px 12px;
+  margin-right: 12px;
+  cursor: pointer;
+}
+
+/* hover */
+.lj-input.lj-file::file-selector-button:hover,
+.lj-input.lj-file::-webkit-file-upload-button:hover {
+  background: var(--lj-black);
+  border-color: var(--lj-black);
+  color: var(--lj-white);
+  transition: color 250ms, border-color 250ms, background-color 250ms;
+}
+
+.lj-file {
+  border: 0;
+  padding: 0;
+}
+
+.lj-input.lj-file::file-selector-button {
+  border: var(--lj-border) solid var(--lj-yellow);
+  border-radius: 0;
+  background: var(--lj-yellow);
+  color: var(--lj-black);
+  font-weight: 900;
+  padding: 6px 12px;
+  margin-right: 12px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: color 250ms, border-color 250ms, background-color 250ms;
 }

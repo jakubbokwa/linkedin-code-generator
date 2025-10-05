@@ -22,9 +22,7 @@ export default async function ResultPage({
 
   return (
     <main className="lj-container">
-      <h1 className="lj-h1">
-        Dein LinkedIn-Post <span className="lj-slash">/</span>
-      </h1>
+      <h1 className="lj-h1">Dein LinkedIn-Post/</h1>
 
       {rec.photoData && (
         // eslint-disable-next-line @next/next/no-img-element
@@ -32,26 +30,16 @@ export default async function ResultPage({
           src={rec.photoData}
           alt="Foto"
           className="lj-img"
-          style={{ marginBottom: 16 }}
+          style={{ marginBottom: 16, maxWidth: "100%" }}
         />
       )}
 
       <section className="lj-section">
-        <div className="lj-label">Basis-Prompt</div>
-        <textarea
-          className="lj-textarea lj-readonly"
-          readOnly
-          rows={5}
-          defaultValue={rec.basePrompt}
-        />
-      </section>
-
-      <section className="lj-section">
         <div className="lj-label">Ausgewählter Text</div>
         <textarea
-          className="lj-textarea"
+          className="lj-textarea lj-plainpara"
           readOnly
-          rows={8}
+          rows={5}
           defaultValue={rec.chosenPost}
         />
       </section>

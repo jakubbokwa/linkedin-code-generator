@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useState } from "react";
-import QRCode from "qrcode"; // <— nowy import
+import QRCode from "qrcode";
 import { BASE_PROMPT_DE, OPTION_TAGS } from "@/lib/constants";
-import CopyButton from "./components/CopyButton";
+import CopyButton from "../app/components/CopyButton";
 
 export default function Home() {
   const [photoDataUrl, setPhotoDataUrl] = useState<string>();
@@ -13,7 +13,7 @@ export default function Home() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // nowy stan dla QR
+  // QR
   const [qrLink, setQrLink] = useState<string | null>(null);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [qrLoading, setQrLoading] = useState(false);
@@ -47,7 +47,7 @@ export default function Home() {
       const json = await res.json();
       if (!json.ok) throw new Error(json.error || "Fehler");
       setVariants(json.variants);
-      // wyczyszczamy poprzedni QR (jeśli był)
+      // wyczyść poprzedni QR
       setQrLink(null);
       setQrDataUrl(null);
     } catch (e: any) {
@@ -96,14 +96,20 @@ export default function Home() {
 
   return (
     <main className="lj-container">
-      <h1 className="lj-h1">
-        JOIN THE TEAM <span className="lj-slash">/</span>
-        <br /> AND BECOME A JOE
-      </h1>
+      <h1 className="lj-h1">WIR VERSTEHEN B2B/</h1>
+
+      <p>
+        Genau deshalb haben wir uns vorsorglich schon mal um Ihren
+        obligatorischen LinkedIn-Post zu den B2B Communication Days 2025
+        gekümmert.
+        <br />
+        <br />
+        Nutzen Sie gerne unseren Postingtext-Generator und unsere Fotowall.
+      </p>
 
       {/* 1) Foto */}
       <section className="lj-section">
-        <label className="lj-label">1) Foto anhängen (optional)</label>
+        <label className="lj-label">Foto anhängen (optional)</label>
         <input
           className="lj-input lj-file"
           type="file"
@@ -116,25 +122,25 @@ export default function Home() {
             src={photoDataUrl}
             alt="Vorschau"
             className="lj-img"
-            style={{ marginTop: 12 }}
+            style={{ marginTop: 12, maxWidth: "100%" }}
           />
         )}
       </section>
 
-      {/* 2) Basis-Prompt */}
+      {/* 2) Basis-Prompt – jak akapit (bez ramki) */}
       <section className="lj-section">
-        <label className="lj-label">2) Basis-Prompt</label>
+        <label className="lj-label">Basis-Prompt</label>
         <textarea
-          className="lj-textarea lj-readonly"
+          className="lj-textarea lj-readonly lj-plainpara"
           readOnly
           value={BASE_PROMPT_DE}
-          rows={5}
+          rows={4}
         />
       </section>
 
       {/* 3) Checkboxy akcentów */}
       <section className="lj-section">
-        <label className="lj-label">3) Zusätzliche Akzente (optional)</label>
+        <label className="lj-label">Zusätzliche Akzente (optional)</label>
         <div
           style={{
             display: "grid",
@@ -146,7 +152,7 @@ export default function Home() {
             <label
               key={opt}
               className="lj-card lj-check-row"
-              style={{ padding: 10 }}
+              style={{ padding: 10, paddingLeft: 0, cursor: "pointer" }}
             >
               <input
                 type="checkbox"
@@ -177,7 +183,7 @@ export default function Home() {
       {variants.length > 0 && (
         <section className="lj-section">
           <p className="lj-label" style={{ marginBottom: 8 }}>
-            4) Wähle genau eine Variante
+            Wähle genau eine Variante
           </p>
           {[0, 1, 2].map((i) => (
             <label
@@ -205,8 +211,8 @@ export default function Home() {
       {/* 6) E-mail + Fertig */}
       {variants.length > 0 && (
         <section className="lj-row lj-section" style={{ marginTop: 8 }}>
+          {/* <label className="lj-label">E-Mail</label> */}
           <div style={{ flex: 1 }}>
-            <label className="lj-label">E-Mail</label>
             <input
               className="lj-input"
               type="email"
@@ -225,7 +231,7 @@ export default function Home() {
         </section>
       )}
 
-      {/* 7) Sekcja QR na dole */}
+      {/* 7) QR na dole */}
       {(qrLoading || qrDataUrl) && (
         <section className="lj-section" style={{ marginTop: 24 }}>
           <div className="lj-label">Dein persönlicher Link</div>
@@ -254,19 +260,22 @@ export default function Home() {
                   border: "6px solid #000",
                   padding: 6,
                   background: "#fff",
+                  maxWidth: "100%",
                 }}
               />
               <div>
                 <div
                   style={{
                     fontWeight: 700,
-                    marginBottom: 6,
+                    marginBottom: 12,
                     wordBreak: "break-all",
+                    color: "#b3b3b3",
                   }}
                 >
                   {qrLink}
                 </div>
                 <div className="lj-row">
+                  <CopyButton text={qrLink} />
                   <a
                     className="lj-btn lj-btn-outline"
                     href={qrLink}
@@ -275,7 +284,6 @@ export default function Home() {
                   >
                     Seite öffnen
                   </a>
-                  <CopyButton text={qrLink} />
                 </div>
               </div>
             </div>
