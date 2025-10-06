@@ -90,6 +90,7 @@ export async function POST(req: Request) {
     "und oddziel sie linią zawierającą wyłącznie trzy myślniki: --- (na osobnej linii).",
     "Kein zusätzlicher Text vor oder nach den Varianten.",
     "Länge pro Variante: idealnie ≤ 400 Zeichen.",
+    "Please also spellcheck the whole text very thoroughly."
   ].join(" ");
 
   const user = [

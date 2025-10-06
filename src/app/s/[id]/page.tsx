@@ -22,7 +22,7 @@ export default async function ResultPage({
 
   return (
     <main className="lj-container">
-      <h1 className="lj-h1">Dein LinkedIn-Post/</h1>
+      <h1 className="lj-h1">Dein LinkedIn-Post<span className="lj-slash">/</span></h1>
 
       {rec.photoData && (
         // eslint-disable-next-line @next/next/no-img-element
@@ -48,6 +48,11 @@ export default async function ResultPage({
         <CopyButton text={rec.chosenPost} />
         <ShareToLinkedIn url={canonicalUrl} />
       </div>
+
+       <section className="lj-section">
+        <div className="lj-label">Haftungs&shy;ausschluss</div>
+        <p className="lj-paragraph">Die im Rahmen dieses Services bereitgestellten Textvorschläge werden automatisiert durch eine KI generiert. Wir übernehmen keine Gewähr für deren Vollständigkeit, Richtigkeit oder rechtliche Unbedenklichkeit. Die Verantwortung für die Nutzung, Veröffentlichung und inhaltliche Prüfung der Texte liegt ausschließlich bei den Teilnehmenden.</p>
+      </section>
     </main>
   );
 }

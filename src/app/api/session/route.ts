@@ -1,28 +1,52 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
-import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { addNoteToContact } from "@/lib/hubspot";
-
-const BodySchema = z.object({
-  email: z.string().email(),
-  chosenPost: z.string().min(5),
-  basePrompt: z.string().min(3),
-  photoDataUrl: z.string().optional(),
-});
 
 export async function POST(req: Request) {
-  const { email, chosenPost, basePrompt, photoDataUrl } = BodySchema.parse(
-    await req.json()
-  );
+  try {
+    const { email, chosenPost, basePrompt, photoDataUrl } = await req.json();
 
-  const rec = await prisma.session.create({
-    data: { email, chosenPost, basePrompt, photoData: photoDataUrl },
-  });
+    if (!email) {
+      return NextResponse.json({ ok: false, error: "E-Mail fehlt" });
+    }
 
-  // Użyj hosta z żądania (działa z <IP>:3000 i na prod)
-  const url = new URL(req.url);
-  const origin = `${url.protocol}//${url.host}`;
-  const link = `${origin}/s/${rec.id}`;
+    // 1️⃣ Zapisz sesję w bazie (tak jak wcześniej)
+    const session = await prisma.session.create({
+      data: {
+        email,
+        chosenPost,
+        basePrompt,
+        photoData: photoDataUrl || null,
+      },
+    });
 
-  return NextResponse.json({ ok: true, id: rec.id, link });
+    // 2️⃣ Wywołaj lokalny endpoint /api/hubspot — on doda kontakt do HubSpota
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+
+      const hubspotRes = await fetch(`${baseUrl}/api/hubspot`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!hubspotRes.ok) {
+        const text = await hubspotRes.text();
+        console.warn("⚠️ HubSpot local API error:", text);
+      } else {
+        console.log("✅ Email sent to HubSpot:", email);
+      }
+    } catch (err) {
+      console.warn("⚠️ HubSpot local API call failed:", err);
+    }
+
+    // 3️⃣ Zwróć link do indywidualnej strony
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+    const link = `${baseUrl}/s/${session.id}`;
+
+    return NextResponse.json({ ok: true, link });
+  } catch (err: any) {
+    console.error("❌ Session error:", err);
+    return NextResponse.json({ ok: false, error: err.message });
+  }
 }

@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 
-export default function CopyButton({ text }: { text: string }) {
+export default function CopyButton({ text, isLink }: { text: string, isLink?: boolean }) {
   const [copied, setCopied] = useState(false);
 
   const handleClick = async () => {
@@ -22,7 +22,7 @@ export default function CopyButton({ text }: { text: string }) {
       onClick={handleClick}
     >
       {/* zamiast zmieniać liczbę znaków – wymieniamy tylko treść */}
-      {copied ? "Kopiert ✓" : "Link kopieren"}
+      {copied ? "Kopiert ✓" : isLink ? "Link kopieren" : "Text kopieren"}
     </button>
   );
 }
