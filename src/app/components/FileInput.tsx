@@ -1,4 +1,10 @@
-const FileInput = ({ onChange }) => {
+import React from "react";
+
+interface FileInputProps {
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+const FileInput: React.FC<FileInputProps> = ({ onChange }) => {
   return (
     <input
       className="lj-input lj-file"

@@ -2,14 +2,15 @@ import { prisma } from "../../../lib/prisma";
 import CopyButton from "../../components/CopyButton";
 import ShareToLinkedIn from "../../components/ShareToLinkedin";
 
-// ✅ Typ zgodny z App Routerem Next.js 15
-interface PageProps {
-  params: { id: string };
-}
+export default async function ResultPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  // params to Promise -> trzeba await
+  const { id } = await params;
 
-export default async function ResultPage({ params }: PageProps) {
-  const rec = await prisma.session.findUnique({ where: { id: params.id } });
-
+  const rec = await prisma.session.findUnique({ where: { id } });
   if (!rec) {
     return (
       <main className="lj-container">
@@ -20,7 +21,7 @@ export default async function ResultPage({ params }: PageProps) {
   }
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-  const canonicalUrl = `${baseUrl}/s/${params.id}`;
+  const canonicalUrl = `${baseUrl}/s/${id}`;
 
   return (
     <main className="lj-container">
